@@ -6,6 +6,8 @@ import {Configuration, OpenAIApi} from 'openai';
 
 import {apiKey} from '../../config';
 
+// todo handle errors
+
 export async function action({request}: ActionArgs) {
   const body = await request.formData();
 
