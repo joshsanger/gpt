@@ -131,7 +131,7 @@ export default function IndexPage() {
           <p>Thinking...</p>
         </div>
       )}
-      {data?.answer && (
+      {!isSubmitting && data?.answer && (
         <div className="answer">
           <p>{data?.answer}</p>
         </div>
