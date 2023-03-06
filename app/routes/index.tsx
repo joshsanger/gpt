@@ -55,6 +55,7 @@ export async function action({request}: ActionArgs) {
               "Automatically remove items with import restrictions in each market to ensure your product catalog is compliant and buyers only see what they’re allowed to purchase in their region.",
               "Access fraud protection on every cross-border order and protect refunds from currency fluctuations with guaranteed foreign exchange."
             ],
+            youtubeVideo: "rRvhTLPCa6I",
           },
           {
             title: "Affordable shipping rates and integrated partners",
@@ -76,7 +77,15 @@ export async function action({request}: ActionArgs) {
       },
       {
         role: 'user',
-        content: 'I am going to now pass you to the user shortly. The user will ask you questions. Let\'s try this one. "Tell me about fullfilment"',
+        content: 'If a product has the key "youtubeVideo" then I want you to append a youtube embed once you are done explaining the product. Use the product ID and the markup should be <iframe width="560" height="315" src="https://www.youtube.com/embed/${youtubeVideo}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>. Now tell me about markets.',
+      },
+      {
+        role: 'assistant',
+        content: 'We have released a complete solution called Markets Pro that can help you grow your business globally. This solution offers end-to-end liability management, cost-effective cross-border shipping and fulfillment, and localization tools. With Markets Pro, you can offload international tax filing, registration, and remittance, and access fraud protection on every cross-border order. You can also protect refunds from currency fluctuations with guaranteed foreign exchange. Additionally, Markets Pro automatically removes items with import restrictions in each market to ensure your product catalog is compliant, and buyers only see what they’re allowed to purchase in their region. For more info, check out this video! <iframe width="560" height="315" src="https://www.youtube.com/embed/rRvhTLPCa6I" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>',
+      },
+      {
+        role: 'user',
+        content: 'Perfect. I am going to now pass you to the user shortly. The user will ask you questions. Let\'s try this one. "Tell me about fullfilment"',
       },
       {
         role: 'assistant',
@@ -120,7 +129,9 @@ export default function IndexPage() {
     if (navigation.state === 'submitting') {
       inputRef.current.value = '';
     }
-  }, [navigation.state])
+  }, [navigation.state]);
+
+
 
   return (
     <main className="container">
@@ -133,7 +144,7 @@ export default function IndexPage() {
       )}
       {!isSubmitting && data?.answer && (
         <div className="answer">
-          <p>{data?.answer}</p>
+          <p dangerouslySetInnerHTML={{__html: data.answer}} />
         </div>
       )}
       <Form method="post">
