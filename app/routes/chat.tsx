@@ -1,3 +1,5 @@
+// require('dotenv').config();
+
 import {useRef, useEffect} from 'react';
 import {json} from '@remix-run/node';
 import {type ActionArgs} from '@remix-run/node';
@@ -5,15 +7,13 @@ import {Form, useActionData, useNavigation, Link} from '@remix-run/react';
 
 import {Configuration, OpenAIApi} from 'openai';
 
-import {apiKey} from '../../config';
-
 // todo handle errors
 
 export async function action({request}: ActionArgs) {
   const body = await request.formData();
 
   const conf = new Configuration({
-    apiKey,
+    apiKey: process.env.OPENAI_API_KEY,
   });
 
   const openai = new OpenAIApi(conf);
@@ -140,7 +140,7 @@ export default function ChatPage() {
       )}
       <Form method="post">
         <div className="input-wrap">
-          <input ref={inputRef} type="text" name="message" placeholder="Was anything released about taxes?" minLength={2} required/>
+          <input ref={inputRef} type="text" name="message" placeholder="Was anything released about taxes?" minLength={2} required />
           <button type="submit" disabled={isSubmitting} aria-disabled={isSubmitting}>Submit</button>
         </div>
       </Form>
