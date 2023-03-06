@@ -11,8 +11,6 @@ import {apiKey} from '../../config';
 export async function action({request}: ActionArgs) {
   const body = await request.formData();
 
-  console.log(apiKey)
-
   const conf = new Configuration({
     apiKey,
   });
