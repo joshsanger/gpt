@@ -1,6 +1,7 @@
+import {useRef, useEffect} from 'react';
 import {json} from '@remix-run/node';
 import {type ActionArgs} from '@remix-run/node';
-import {Form, useActionData} from '@remix-run/react';
+import {Form, useActionData, useNavigation, Link} from '@remix-run/react';
 
 import {Configuration, OpenAIApi} from 'openai';
 
@@ -98,8 +99,6 @@ export async function action({request}: ActionArgs) {
     ],
   });
 
-  console.log(chat.data);
-
   const answer = chat.data.choices[0].message?.content;
 
   return {
@@ -110,11 +109,30 @@ export async function action({request}: ActionArgs) {
 
 export default function ChatPage() {
   const data = useActionData<typeof action>();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const navigation = useNavigation();
+
+  const isSubmitting = navigation.state === 'submitting';
+
+  useEffect(() => {
+    if (!inputRef.current) {
+      return;
+    }
+
+    if (navigation.state === 'submitting') {
+      inputRef.current.value = '';
+    }
+  }, [navigation.state])
 
   return (
-    <div className="container">
+    <main className="container">
       <h1>Editions Winter ’23 (Go Global) chat</h1>
       <p>Ask a question about our Go Global solution for Winter ’23</p>
+      {isSubmitting && (
+        <div className="answer">
+          <p>Thinking...</p>
+        </div>
+      )}
       {data?.answer && (
         <div className="answer">
           <p>{data?.answer}</p>
@@ -122,10 +140,20 @@ export default function ChatPage() {
       )}
       <Form method="post">
         <div className="input-wrap">
-          <input type="text" name="message" placeholder="Was anything released about taxes?"/>
-          <button type="submit">Submit</button>
+          <input ref={inputRef} type="text" name="message" placeholder="Was anything released about taxes?" minLength={2} required/>
+          <button type="submit" disabled={isSubmitting} aria-disabled={isSubmitting}>Submit</button>
         </div>
       </Form>
-    </div>
+    </main>
+  );
+}
+
+export function ErrorBoundary({error}) {
+  return (
+    <main className="container">
+      <h1>Oops. You broke something, way to go!</h1>
+      <p className="error">{error.message}</p>
+      <p>Back to <Link to="/chat">chat</Link></p>
+    </main>
   );
 }

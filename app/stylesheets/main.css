@@ -1,14 +1,18 @@
 body {
-  background: #ffffff;
+  background: #000000;
   color: #000000;
   font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  margin-top: clamp(12px, 4vw, 60px);
   padding: 30px;
   line-height: 1.5;
 }
 
 .container {
-  max-width: 700px;
+  max-width: 780px;
   margin: 0 auto;
+  padding: 30px;
+  background: #ffffff;
+  border-radius: 24px;
 }
 
 input {
@@ -45,6 +49,13 @@ button:hover {
   color: #ffffff;
 }
 
+button:disabled,
+button[aria-disabled="true"] {
+  background: #e0e0e0;
+  color: #000000;
+  cursor: not-allowed;
+}
+
 .input-wrap {
   display: flex;
   align-items: center;
@@ -58,7 +69,7 @@ form {
 }
 
 h1 {
-  margin-bottom: 12px;
+  margin: 0 0 12px 0;
   font-size: clamp(24px, 5vw, 36px);
 }
 
@@ -75,6 +86,20 @@ p {
   font-family: monospace;
 }
 
+.error {
+  background: #f0f0f0;
+  padding: 20px;
+  padding: 20px;
+  border-radius: 8px;
+  color: #912020;
+  font-family: monospace;
+  border: solid 1px #912020;
+}
+
+a {
+  color: #db542a;
+}
+
 @media screen and (max-width: 600px) {
   .input-wrap {
     display: block;
@@ -85,7 +110,7 @@ p {
   }
 
   body {
-    padding: 20px;
+    padding: 12px;
   }
 
   form {
