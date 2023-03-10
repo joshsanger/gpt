@@ -1,4 +1,4 @@
-import {useRef, useEffect} from 'react';
+import {useRef, useEffect, useState} from 'react';
 import {json} from '@remix-run/node';
 import {type ActionArgs} from '@remix-run/node';
 import {Form, useActionData, useNavigation, Link} from '@remix-run/react';
@@ -115,11 +115,32 @@ export async function action({request}: ActionArgs) {
 }
 
 export default function IndexPage() {
+  const initialHeight = '42px';
+
   const data = useActionData<typeof action>();
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const navigation = useNavigation();
 
+  const [height, setHeight] = useState(initialHeight);
+
   const isSubmitting = navigation.state === 'submitting';
+
+  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+
+    if (!inputRef.current) {
+      return;
+    }
+
+    const val = inputRef.current.value;
+
+    console.log(!val)
+
+    if (!val) {
+      setHeight(initialHeight);
+    } else {
+      setHeight(`${event.target.scrollHeight}px`);
+    }
+  };
 
   useEffect(() => {
     if (!inputRef.current) {
@@ -130,8 +151,6 @@ export default function IndexPage() {
       inputRef.current.value = '';
     }
   }, [navigation.state]);
-
-
 
   return (
     <main className="container">
@@ -149,7 +168,16 @@ export default function IndexPage() {
       )}
       <Form method="post">
         <div className="input-wrap">
-          <input ref={inputRef} type="text" name="message" placeholder="Was anything released about taxes?" minLength={2} required />
+          <textarea
+            ref={inputRef}
+            className="auto-growing-input"
+            placeholder="Was anything released about taxes?"
+            name="message"
+            onChange={handleChange}
+            required
+            style={{height}}
+          />
+          {/* <input ref={inputRef} type="text" name="message" placeholder="Was anything released about taxes?" minLength={2} required /> */}
           <button type="submit" disabled={isSubmitting} aria-disabled={isSubmitting}>Submit</button>
         </div>
       </Form>
