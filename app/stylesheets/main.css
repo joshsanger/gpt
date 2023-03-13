@@ -37,12 +37,12 @@ textarea {
   padding: 12px;
   border: 2px solid #ccc;
   border-radius: 4px;
-  height: 42px;
+  resize: none;
   /* transition: height 0.2s ease-in-out; */
   /* overflow-y: hidden; */
-  max-height: 200px;
   width: 100%;
   flex: 1 1 auto;
+  line-height: 1.5;
 }
 
 button {

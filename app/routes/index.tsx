@@ -1,7 +1,7 @@
-import {useRef, useEffect, useState} from 'react';
+import {useRef, useEffect, useCallback} from 'react';
 import {json} from '@remix-run/node';
 import {type ActionArgs} from '@remix-run/node';
-import {Form, useActionData, useNavigation, Link} from '@remix-run/react';
+import {Form, useActionData, useNavigation, Link, useSubmit} from '@remix-run/react';
 
 import {Configuration, OpenAIApi} from 'openai';
 
@@ -115,32 +115,50 @@ export async function action({request}: ActionArgs) {
 }
 
 export default function IndexPage() {
-  const initialHeight = '42px';
+  const minTextareaRows = 1;
+  const maxTextareaRows = 6;
 
   const data = useActionData<typeof action>();
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const navigation = useNavigation();
-
-  const [height, setHeight] = useState(initialHeight);
+  const submit = useSubmit();
 
   const isSubmitting = navigation.state === 'submitting';
 
+  /**
+   * Handles the change event of a textarea element and adjusts its height based on the content.
+   * Note: Using the ref to alter the rows rather than state since it's more performant / faster.
+   * @param event - The change event of the textarea element.
+   */
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-
     if (!inputRef.current) {
       return;
     }
 
-    const val = inputRef.current.value;
+    // reset required for when the user pressed backspace (otherwise it would stay at max rows)
+    inputRef.current.rows = minTextareaRows;
 
-    console.log(!val)
+    const lineHeight = parseInt(window.getComputedStyle(inputRef.current).lineHeight);
+    const paddingTop = parseInt(window.getComputedStyle(inputRef.current).paddingTop);
+    const paddingBottom = parseInt(window.getComputedStyle(inputRef.current).paddingBottom);
+    const scrollHeight = inputRef.current.scrollHeight - paddingTop - paddingBottom;
+    const currentRows = Math.floor(scrollHeight / lineHeight);
 
-    if (!val) {
-      setHeight(initialHeight);
+    if (currentRows >= maxTextareaRows) {
+      inputRef.current.rows = maxTextareaRows;
+      inputRef.current.scrollTop = event.target.scrollHeight;
     } else {
-      setHeight(`${event.target.scrollHeight}px`);
+      inputRef.current.rows = currentRows;
     }
   };
+
+  const submitFormOnEnter = useCallback((event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      submit(formRef.current, {replace: true});
+    }
+  }, [submit, formRef]);
 
   useEffect(() => {
     if (!inputRef.current) {
@@ -166,7 +184,7 @@ export default function IndexPage() {
           <p dangerouslySetInnerHTML={{__html: data.answer}} />
         </div>
       )}
-      <Form method="post">
+      <Form method="post" ref={formRef}>
         <div className="input-wrap">
           <textarea
             ref={inputRef}
@@ -175,9 +193,9 @@ export default function IndexPage() {
             name="message"
             onChange={handleChange}
             required
-            style={{height}}
+            rows={1}
+            onKeyDown={submitFormOnEnter}
           />
-          {/* <input ref={inputRef} type="text" name="message" placeholder="Was anything released about taxes?" minLength={2} required /> */}
           <button type="submit" disabled={isSubmitting} aria-disabled={isSubmitting}>Submit</button>
         </div>
       </Form>
